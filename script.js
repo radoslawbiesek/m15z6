@@ -35,41 +35,35 @@ class Stopwatch extends React.Component {
     }
 
     calculate() {
-        let newTimes = Object.assign({}, this.state.times);
-        
-        newTimes.miliseconds = newTimes.miliseconds + 1;
-        console.log(newTimes);
-        
-        if (newTimes.miliseconds >= 100) {
-            newTimes.miliseconds = 0;
-            newTimes.seconds = newTimes.seconds + 1;
+        let { times } = this.state;
+
+        times.miliseconds ++;
+
+        if (times.miliseconds >= 100) {
+            times.miliseconds = 0;
+            times.seconds += 1;
         }
-        if (newTimes.seconds >= 60) {
-            newTimes.seconds = 0;
-            newTimes.minutes = newTimes.minutes + 1;
+        if (times.seconds >= 60) {
+            times.seconds = 0;
+            times.minutes ++;
         }
 
-        this.setState({
-            times: {
-                miliseconds: newTimes.miliseconds,
-                seconds: newTimes.seconds,
-                minutes: newTimes.minutes,
-            }
-        });
+        this.setState({ times });
     }
 
     stop() {
-        this.state.running = false;
+        this.setState({running : false});
         clearInterval(this.watch);
     }
 
     add() {
+        let { results } = this.state;
         let newResult = {
             time: this.format(),
             id: Date.now(),
         };
         this.setState({ 
-            results: this.state.results.concat(newResult)
+            results: results.concat(newResult)
         });
     }
 
@@ -82,8 +76,9 @@ class Stopwatch extends React.Component {
     }
 
     format() {
+        const {miliseconds, seconds, minutes} = this.state.times;
         return (
-            `${this.pad0(this.state.times.minutes)}:${this.pad0(this.state.times.seconds)}:${this.pad0(Math.floor(this.state.times.miliseconds))}`
+            `${this.pad0(minutes)}:${this.pad0(seconds)}:${this.pad0(Math.floor(miliseconds))}`
         );
     }
 
@@ -115,10 +110,11 @@ class Stopwatch extends React.Component {
 
 class Results extends React.Component {
     render() {
+        const { results } = this.props;
         return (
             <ul className="results">
-                {this.props.results.map(result => (
-                    <li key={result.id}>{result.time}</li>
+                {results.map(({id, time}) => (
+                    <li key={id}>{time}</li>
                 ))}
             </ul>
         );
